@@ -7,20 +7,22 @@ module.exports = (grunt)->
   grunt.registerMultiTask 'stylsprite',"wait a minute.",->
     done = do @async
     options = @options()
-    for task in @files
-      destDir = task.dest
-      async.forEach task.src,
-        (srcPath,next)->
-          if not fs.statSync(srcPath).isDirectory() then return next true
-          console.log 'process:',srcPath
-          nodeSprite.sprites path:srcPath,(err,result)->
-            if err then return next true
-            for key,{name:name} of result
-              jsonPath = path.join srcPath,"#{name}.json"
-              jsonBuffer = fs.readFileSync jsonPath
-              json = JSON.parse jsonBuffer
-              srcPath = path.join srcPath,"#{name}-#{json.shortsum}.png"
-              destPath = "#{destDir}/#{name}.png"
-              fs.renameSync srcPath,destPath
-            next false
-        (err)-> done not err
+    eachTask = (task,next)->
+      imgDir = task.dest
+      spriteDir = task.src[0]
+      # console.log 'imgDir:',imgDir
+      # console.log 'spriteDir:',spriteDir
+      if not fs.statSync(spriteDir).isDirectory() then return next true
+      nodeSprite.sprites path:spriteDir,(err,result)->
+        # console.log result
+        if err then return next true
+        for key,spriteData of result
+          jsonPath = path.join spriteDir,"#{spriteData.name}.json"
+          # console.log jsonPath,spriteDir
+          jsonBuffer = fs.readFileSync jsonPath
+          json = JSON.parse jsonBuffer
+          spritePath = path.join spriteDir,"#{spriteData.name}-#{json.shortsum}.png"
+          destPath = "#{imgDir}/#{spriteData.name}.png"
+          fs.renameSync spritePath,destPath
+        next false
+    async.forEach @files,eachTask,done

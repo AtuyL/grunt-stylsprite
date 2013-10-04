@@ -2,7 +2,7 @@
   "name": "grunt-stylsprite",
   "version": "0.0.1",
   "description": "css sprite for stylus",
-  "main": "Gruntfile.coffee",
+  "main": "index.js",
   "directories": {
     "test": "test"
   },

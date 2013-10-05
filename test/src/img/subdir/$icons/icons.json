@@ -1,0 +1,55 @@
+{
+  "name": "icons",
+  "checksum": "d565913cb0196aa5737655caf6ef67f9",
+  "shortsum": "d5659",
+  "width": 94,
+  "height": 478,
+  "padding": 2,
+  "images": [
+    {
+      "name": "apple",
+      "filename": "apple.png",
+      "checksum": "dc080dad5df11b548ab19f14e890ac27",
+      "width": 94,
+      "height": 94,
+      "positionX": 0,
+      "positionY": 0
+    },
+    {
+      "name": "calendar",
+      "filename": "calendar.png",
+      "checksum": "6750fc1b53145eb5fae753cbeccf3e67",
+      "width": 94,
+      "height": 94,
+      "positionX": 0,
+      "positionY": 96
+    },
+    {
+      "name": "fitness",
+      "filename": "fitness.png",
+      "checksum": "59a9311b14c3e3b117900da16d82198a",
+      "width": 94,
+      "height": 94,
+      "positionX": 0,
+      "positionY": 192
+    },
+    {
+      "name": "heart",
+      "filename": "heart.png",
+      "checksum": "7f5fb09c3fe9da7b1f3a7c4cdc438099",
+      "width": 94,
+      "height": 94,
+      "positionX": 0,
+      "positionY": 288
+    },
+    {
+      "name": "timer",
+      "filename": "timer.png",
+      "checksum": "ad8d4b846883ff846d3d9438d6aeaca1",
+      "width": 94,
+      "height": 94,
+      "positionX": 0,
+      "positionY": 384
+    }
+  ]
+}

@@ -1,19 +1,9 @@
-body h1 {
+body {
   background-image: url("../img/icons/apple.png");
-  background-image: url(../img/icons.png);
+  background-image: url(../img/icons/apple.png);
   background-position: 0px 0px;
-  width: 94px;
-  height: 94px;
-}
-body h2 {
-  background-image: url(icons.png);
-  background-position: 0px -192px;
-  width: 94px;
-  height: 94px;
-}
-body h3 {
-  background-image: url(/icons.png);
-  background-position: 0px -288px;
-  width: 94px;
-  height: 94px;
+  background-size: 47px 239px;
+  background-repeat: no-repeat;
+  width: 47px;
+  height: 47px;
 }

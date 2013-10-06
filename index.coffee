@@ -36,6 +36,7 @@ plugin = (cssPath,options)->
     spriteName = path.basename dirName
     spriteTokenName = path.basename localPath,extName
     jsonPath = "#{path.dirname dirName}/$#{spriteName}/#{spriteName}.json"
+    url = "#{path.dirname path.dirname imagePath}/#{spriteName}.png"
     if fs.existsSync jsonPath
       jsonStr = fs.readFileSync jsonPath
       json = JSON.parse jsonStr.toString()
@@ -64,7 +65,7 @@ plugin = (cssPath,options)->
         else
           this.closestBlock.nodes.splice this.closestBlock.index + 1,0,backgroundPosition,width,height
         break
-      return new stylus.nodes.Property ['background-image'],"url(#{imagePath})"
+      return new stylus.nodes.Property ['background-image'],"url(#{url})"
     return null
   return -> (context)->
     context.define 'stylsprite',stylsprite

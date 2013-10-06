@@ -7,6 +7,7 @@ module.exports = (grunt)->
   nodeSprite = require 'node-sprite'
   mapper = require 'node-sprite/lib/mapper'
 
+  # extends from node-sprite lib
   Sprite = require 'node-sprite/lib/sprite'
   Image = require 'node-sprite/lib/image'
   class StylSprite extends Sprite
@@ -60,13 +61,12 @@ module.exports = (grunt)->
           positionY: image.positionY
         info.images.push imageInfo
 
-      console.log '_toJson:',info
       info = JSON.stringify(info, null, '  ')
       fs.writeFileSync @jsonUrl(), info
     _fromJson: ->
+      # now omitting yet ..
 
   generate = (src,options,callback)->
-    console.log 'src:',src
     options ?= {}
     padding = options.padding || 2
 

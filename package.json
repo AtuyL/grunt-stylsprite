@@ -1,6 +1,6 @@
 {
   "name": "grunt-stylsprite",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "css sprite for stylus",
   "main": "index.js",
   "directories": {
@@ -8,8 +8,7 @@
   },
   "dependencies": {
     "node-sprite": "~0.1.2",
-    "stylus": "~0.38.0",
-    "mkdirp": "~0.3.5"
+    "stylus": "~0.38.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

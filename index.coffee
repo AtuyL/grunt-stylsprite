@@ -2,7 +2,7 @@ fs = require 'fs'
 path = require 'path'
 stylus = require 'stylus'
 plugin = (cssPath,options)->
-  console.log options
+  # console.log options
   options ?= {}
   rootPath = options.rootPath or ''
   imgPath = options.imgPath or ''
@@ -22,16 +22,13 @@ plugin = (cssPath,options)->
   convertToLocalPath = (url)->
     if /^\//i.test url
       path.resolve path.join rootPath,url
-    else if not /^http:\/\//i.test url
+    else if not /^https?:\/\//i.test url
       path.resolve cssPath,url
     else
       throw new Error 'sorry. unsupport yet.. : ' + url
 
 
   stylsprite = (params)->
-    console.log '================================'
-    # console.log 'do spritePath--------\n',cssPath,imgPath,spritePath
-
     imagePath = getImagePath params
     localPath = convertToLocalPath imagePath
     extName = path.extname localPath
@@ -39,7 +36,6 @@ plugin = (cssPath,options)->
     spriteName = path.basename dirName
     spriteTokenName = path.basename localPath,extName
     jsonPath = "#{path.dirname dirName}/$#{spriteName}/#{spriteName}.json"
-    console.log jsonPath
     if fs.existsSync jsonPath
       jsonStr = fs.readFileSync jsonPath
       json = JSON.parse jsonStr.toString()

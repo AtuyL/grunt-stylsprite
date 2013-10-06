@@ -1,6 +1,6 @@
 {
   "name": "grunt-stylsprite",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "css sprite for stylus",
   "main": "index.js",
   "directories": {
@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "node-sprite": "~0.1.2",
-    "stylus": "~0.38.0"
+    "stylus": "~0.38.0",
+    "imagesize": "~1.0.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -30,9 +31,11 @@
     "css",
     "sprite"
   ],
-  "author": "AtuyL",
+  "author": {
+    "name": "AtuyL"
+  },
   "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/AtuyL/grunt-stylsprite/issues"
-  }
+  },
 }

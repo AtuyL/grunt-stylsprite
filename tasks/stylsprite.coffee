@@ -1,7 +1,6 @@
 module.exports = (grunt)->
   fs = require 'fs'
   path = require 'path'
-  mkdirp = require 'mkdirp'
   async = grunt.util.async
 
   nodeSprite = require 'node-sprite'

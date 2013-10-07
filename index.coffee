@@ -53,7 +53,7 @@ plugin = (cssPath,options)->
       jsonStr = fs.readFileSync jsonPath
       json = JSON.parse jsonStr.toString()
 
-      url = "#{path.dirname path.dirname imagePath}/#{json.name}-#{prefix}#{json.shortsum}.png"
+      url = "#{path.dirname path.dirname imagePath}/#{json.name}-#{json.shortsum}.png"
 
       spriteWidth = json.width
       spriteHeight = json.height

@@ -25,16 +25,21 @@ module.exports = do ->
     write: (cb) ->
       self = this
       jsonUrl = @jsonUrl()
-      url = @url()
+      url = null
       async.series
         checkJson:(cb)->
-          fs.exists jsonUrl, (exists) =>
-            if exists then fs.unlink jsonUrl,cb
+          fs.exists jsonUrl, (exists) ->
+            if exists
+              json = JSON.parse fs.readFileSync jsonUrl
+              url = "#{path.dirname self.url()}/#{json.name}-#{json.shortsum}.png"
+              fs.unlink jsonUrl,cb
             else do cb
         checkSprite:(cb)->
-          fs.exists url, (exists) =>
-            if exists then fs.unlink url,cb
-            else do cb
+          if url
+            fs.exists url, (exists) ->
+              if exists then fs.unlink url,cb
+              else do cb
+          else do cb
         (err)->
           if not err then self._write cb
           else throw new Error err

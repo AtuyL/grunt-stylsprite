@@ -10,17 +10,18 @@ module.exports = (grunt)->
     sprite.load (err) ->
       sprite.write (err) ->
         callback err,sprite
-    # console.log sprite
     sprite
 
   grunt.registerMultiTask 'stylsprite',"wait a minute.",->
-    # console.log 'tmpdir:',require('os').tmpdir()
     done = do @async
     options = @options
       prefix:''
       padding:2
     eachSrc = (src,next)->
-      if not fs.statSync(src).isDirectory() then return next false
+      if not fs.existsSync src then return next false
+      else if not fs.statSync(src).isDirectory() then return next false
+
       if not options.prefix or path.basename(src).indexOf(options.prefix) isnt 0 then return next false
+      
       return generate src,options,next
     async.forEachSeries @filesSrc,eachSrc,done

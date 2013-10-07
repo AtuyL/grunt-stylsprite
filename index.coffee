@@ -1,25 +1,29 @@
+os = require 'os'
 fs = require 'fs'
 path = require 'path'
 stylus = require 'stylus'
 imagesize = require('imagesize').Parser
+sumpath = require './lib/sumpath'
 
 plugin = (cssPath,options)->
   # console.log options
   options ?= {}
   rootPath = options.rootPath or ''
-  imgPath = options.imgPath or ''
-  spritePath = options.spritePath or ''
   pixelRatio = options.pixelRatio or 1
+  prefix = options.prefix or ''
 
   getImagePath = (params)->
-    urlArgs = params.args.nodes[0]
-    if urlArgs.nodes.length
-      urlChain = []
-      for value in urlArgs.nodes
-        urlChain.push value.string
-      url = urlChain.join ''
+    if params.args
+      urlArgs = params.args.nodes[0]
+      if urlArgs.nodes.length
+        urlChain = []
+        for value in urlArgs.nodes
+          urlChain.push value.string
+        return urlChain.join ''
+      else
+        return urlArgs.nodes[0]
     else
-      url = urlArgs.nodes[0]
+      return params.val
 
   convertToLocalPath = (url)->
     if /^\//i.test url
@@ -30,14 +34,14 @@ plugin = (cssPath,options)->
       throw new Error 'sorry. unsupport yet.. : ' + url
 
   stylsprite = (params)->
-    imagePath = getImagePath params
-    localPath = convertToLocalPath imagePath
-    extName = path.extname localPath
-    dirName = path.dirname localPath
-    spriteName = path.basename dirName
-    spriteTokenName = path.basename localPath,extName
-    jsonPath = "#{path.dirname dirName}/$#{spriteName}/#{spriteName}.json"
-    url = "#{path.dirname path.dirname imagePath}/#{spriteName}.png"
+    imagePath = getImagePath params # hoge/$fuga/foo.png
+    localPath = convertToLocalPath imagePath # /User/Piyo/Project/hoge/$fuga/foo.png
+    
+    extName = path.extname localPath # .png
+    dirName = path.dirname localPath # /User/Piyo/Project/hoge/$fuga
+    
+    jsonPath = path.join os.tmpdir(),sumpath.json(path.resolve dirName)
+    
     backgroundImage = null
     backgroundPosition = null
     backgroundSize = null
@@ -45,10 +49,16 @@ plugin = (cssPath,options)->
     width = null
     height = null
     if fs.existsSync jsonPath
+      
       jsonStr = fs.readFileSync jsonPath
       json = JSON.parse jsonStr.toString()
+
+      url = "#{path.dirname path.dirname imagePath}/#{json.name}-#{prefix}#{json.shortsum}.png"
+
       spriteWidth = json.width
       spriteHeight = json.height
+
+      spriteTokenName = path.basename localPath,extName # foo
       for token in json.images when token.name is spriteTokenName
         positionX = token.positionX
         positionY = token.positionY

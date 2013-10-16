@@ -10,7 +10,6 @@ plugin = (cssPath,options)->
   options ?= {}
   rootPath = options.rootPath or ''
   pixelRatio = options.pixelRatio or 1
-  prefix = options.prefix or ''
 
   getImagePath = (params)->
     if params.args
@@ -60,19 +59,19 @@ plugin = (cssPath,options)->
 
       spriteTokenName = path.basename localPath,extName # foo
       for token in json.images when token.name is spriteTokenName
-        positionX = token.positionX
-        positionY = token.positionY
+        x = token.x
+        y = token.y
         width = token.width
         height = token.height
         if pixelRatio isnt 1
+          x /= pixelRatio
+          y /= pixelRatio
           width /= pixelRatio
           height /= pixelRatio
-          positionX /= pixelRatio
-          positionY /= pixelRatio
           spriteWidth /= pixelRatio
           spriteHeight /= pixelRatio
           backgroundSize = new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
-        backgroundPosition = new stylus.nodes.Property ['background-position'],"#{-positionX}px #{-positionY}px"
+        backgroundPosition = new stylus.nodes.Property ['background-position'],"#{-x}px #{-y}px"
         backgroundImage = new stylus.nodes.Property ['background-image'],"url(#{url})"
     else if fs.existsSync localPath
       imageData = fs.readFileSync localPath

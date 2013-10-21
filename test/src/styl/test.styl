@@ -1,11 +1,17 @@
 body
 	background-image url('../img/icons/apple.png')
+	// absolutes
+	stylsprite "/img/timer.png",2
+	stylsprite "/img/allinone/icons/apple.png"
+	// relatives
 	stylsprite '../img/icons/apple.png'
 	stylsprite '../img/subdir/icons/heart.png'
 	stylsprite "../img/allinone/icons/apple.png"
 	stylsprite "../img/srcdest/icons/apple.png"
 	stylsprite "../img/multisrc/icons/apple.png"
 	stylsprite "../img/timer.png",2
-	stylsprite "/img/timer.png",2
-	stylsprite "/img/allinone/icons/apple.png"
+	// brother
 	stylsprite "./img/timer.png",1
+	stylsprite "./img/timer.png",1
+	// not exist
+	stylsprite "./img/hoge.png",1

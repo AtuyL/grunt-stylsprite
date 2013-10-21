@@ -82,7 +82,8 @@ plugin = (cssPath,options={})->
       backgroundSize = new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
       this.closestBlock.nodes.splice nodesIndex,0,width,height,backgroundImage,backgroundSize
       return null
-    return null
+    
+    return new stylus.nodes.Property ['background-image'],"url(#{url})"
   -> (context)-> context.define 'stylsprite',stylsprite
 
 exports = module.exports = plugin

@@ -6,18 +6,31 @@ module.exports = (grunt)->
 	@loadTasks 'tasks'
 	stylsprite = require('./')
 	stylspriteOptions =
-		prefix:'$'
 		rootPath:'test/src'
 		pixelRatio:2
+		debug:true
 	
 	@initConfig
-		clean:[
-			'test/src/img/$*.png'
-			'test/dest/img/$*.png'
-		]
+		clean:['test/dest/**/*']
 		stylsprite:
 			options: stylspriteOptions
-			test:'test/src/img/**'
+			allinone:files:['test/src/img/allinone.png':'test/src/img/**/*']
+			nodest:'test/src/img/**/*'
+			srcdest:files:['test/src/img/srcdest.png':'test/src/img/*']
+			multisrc:
+				options:test:true
+				files:['test/src/img/multisrc.png':['test/src/img/icons','test/src/img/subdir/icons/*']]
+			hasdestexpand:files:[
+				expand: true
+				cwd: 'test/src/img'
+				src: ['*']
+				dest: 'test/src/img'
+			]
+			nodestexpand:files:[
+				expand: true
+				cwd: 'test/src/img'
+				src: ['*']
+			]
 		copy:
 			test: files: [
 				expand: true

@@ -2,105 +2,88 @@ os = require 'os'
 fs = require 'fs'
 path = require 'path'
 stylus = require 'stylus'
+crypto = require 'crypto'
 imagesize = require('imagesize').Parser
-sumpath = require './lib/sumpath'
 
-plugin = (cssPath,options)->
-  # console.log options
-  options ?= {}
+plugin = (cssPath,options={})->
+  TMPDIR = do os.tmpdir
+
+  hash = (value)->
+    md5sum = crypto.createHash 'md5'
+    md5sum.update value,'utf8'
+    md5sum.digest('hex')
+
   rootPath = options.rootPath or ''
-  pixelRatio = options.pixelRatio or 1
 
-  getImagePath = (params)->
+  parseUrl = (params)->
     if params.args
       urlArgs = params.args.nodes[0]
       if urlArgs.nodes.length
-        urlChain = []
-        for value in urlArgs.nodes
-          urlChain.push value.string
-        return urlChain.join ''
+        url = (value.string for value in urlArgs.nodes).join ''
       else
-        return urlArgs.nodes[0]
+        url = urlArgs.nodes[0]
     else
-      return params.val
+      url = params.val
 
-  convertToLocalPath = (url)->
+  parsePath = (url)->
     if /^\//i.test url
-      path.resolve path.join rootPath,url
+      path.join path.relative(cssPath,rootPath),url
     else if not /^https?:\/\//i.test url
-      path.resolve cssPath,url
+      url
     else
       throw new Error 'sorry. unsupport yet.. : ' + url
 
-  stylsprite = (params)->
-    imagePath = getImagePath params # hoge/$fuga/foo.png
-    localPath = convertToLocalPath imagePath # /User/Piyo/Project/hoge/$fuga/foo.png
-    
-    extName = path.extname localPath # .png
-    dirName = path.dirname localPath # /User/Piyo/Project/hoge/$fuga
-    
-    jsonPath = path.join os.tmpdir(),sumpath.json(path.resolve dirName)
-    
-    backgroundImage = null
-    backgroundPosition = null
-    backgroundSize = null
-    backgroundRepeat = null
-    width = null
-    height = null
-    if fs.existsSync jsonPath
-      
-      jsonStr = fs.readFileSync jsonPath
-      json = JSON.parse jsonStr.toString()
+  stylsprite = (url,pixelRatio)->
+    jsonFile = hash(do process.cwd) + '.json'
+    jsonPath = path.join TMPDIR,jsonFile
+    jsonData = if fs.existsSync jsonPath then JSON.parse fs.readFileSync jsonPath else null
 
-      url = "#{path.dirname path.dirname imagePath}/#{json.name}-#{json.shortsum}.png"
+    url = parseUrl url
+    imagePath = parsePath url
+    pixelRatio = parseFloat(pixelRatio?.val or options.pixelRatio) or 1
+    
+    targetPath = path.join cssPath,imagePath
 
-      spriteWidth = json.width
-      spriteHeight = json.height
+    nodesIndex = this.closestBlock.index + 1
+    backgroundRepeat = new stylus.nodes.Property ['background-repeat'],"no-repeat"
 
-      spriteTokenName = path.basename localPath,extName # foo
-      for token in json.images when token.name is spriteTokenName
-        x = token.x
-        y = token.y
-        width = token.width
-        height = token.height
-        if pixelRatio isnt 1
-          x /= pixelRatio
-          y /= pixelRatio
-          width /= pixelRatio
-          height /= pixelRatio
-          spriteWidth /= pixelRatio
-          spriteHeight /= pixelRatio
-          backgroundSize = new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
-        backgroundPosition = new stylus.nodes.Property ['background-position'],"#{-x}px #{-y}px"
+    for spriteId,spriteData of jsonData when targetPath.indexOf(spriteId) is 0
+      itemId = targetPath.replace(spriteId + '/','')
+      itemData = spriteData.items[itemId]
+      spriteWidth = spriteData.width / pixelRatio
+      spriteHeight = spriteData.height / pixelRatio
+      if itemData
+        x = itemData.x / pixelRatio
+        y = itemData.y / pixelRatio
+        width = itemData.width / pixelRatio
+        height = itemData.height / pixelRatio
+        url = imagePath.replace '/' + itemData.id,'.png'
+        width = new stylus.nodes.Property ["width"],"#{width}px"
+        height = new stylus.nodes.Property ["height"],"#{height}px"
         backgroundImage = new stylus.nodes.Property ['background-image'],"url(#{url})"
-    else if fs.existsSync localPath
-      imageData = fs.readFileSync localPath
+        backgroundPosition = new stylus.nodes.Property ['background-position'],"#{-x}px #{-y}px"
+        backgroundSize = new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
+        this.closestBlock.nodes.splice nodesIndex,0,width,height,backgroundImage,backgroundPosition,backgroundSize
+        return null
+
+    if fs.existsSync targetPath
+      imageData = fs.readFileSync targetPath
       parser = do imagesize
       switch parser.parse imageData
         when imagesize.EOF or imagesize.INVALID 
           console.log 'invalid:',localPath
           return null
         when imagesize.DONE then {width:width,height:height} = do parser.getResult
-      if pixelRatio isnt 1
-        width /= pixelRatio
-        height /= pixelRatio
-        backgroundSize = new stylus.nodes.Property ['background-size'],"#{width}px #{height}px"
-      backgroundImage = new stylus.nodes.Property ['background-image'],"url(#{imagePath})"
-    else
-      return new stylus.nodes.Property ['background-image'],"url(#{imagePath})"
-      
-    backgroundRepeat = new stylus.nodes.Property ['background-repeat'],"no-repeat"
-    width = new stylus.nodes.Property ["width"],"#{width}px"
-    height = new stylus.nodes.Property ["height"],"#{height}px"
-    if backgroundPosition and backgroundSize
-      this.closestBlock.nodes.splice this.closestBlock.index + 1,0,backgroundPosition,backgroundSize,backgroundRepeat,width,height
-    else if backgroundPosition
-      this.closestBlock.nodes.splice this.closestBlock.index + 1,0,backgroundPosition,backgroundRepeat,width,height
-    else if backgroundSize
-      this.closestBlock.nodes.splice this.closestBlock.index + 1,0,backgroundSize,width,height
-    return backgroundImage
-  return -> (context)->
-    context.define 'stylsprite',stylsprite
+      spriteWidth = width / pixelRatio
+      spriteHeight = height / pixelRatio
+      width = new stylus.nodes.Property ["width"],"#{spriteWidth}px"
+      height = new stylus.nodes.Property ["height"],"#{spriteHeight}px"
+      backgroundImage = new stylus.nodes.Property ['background-image'],"url(#{url})"
+      backgroundSize = new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
+      this.closestBlock.nodes.splice nodesIndex,0,width,height,backgroundImage,backgroundSize
+      return null
+    return null
+  -> (context)-> context.define 'stylsprite',stylsprite
 
 exports = module.exports = plugin
 exports.path = __dirname

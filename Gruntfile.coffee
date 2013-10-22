@@ -8,7 +8,6 @@ module.exports = (grunt)->
 	stylspriteOptions =
 		rootPath:'test/src'
 		pixelRatio:2
-		debug:true
 	
 	@initConfig
 		clean:['test/dest/**/*']

@@ -57,7 +57,7 @@ plugin = (cssPath,options={})->
         y = itemData.y / pixelRatio
         width = itemData.width / pixelRatio
         height = itemData.height / pixelRatio
-        url = imagePath.replace '/' + itemData.id,'.png'
+        url = imagePath.replace '/' + itemData.id,".#{spriteData.extname}"
         width = new stylus.nodes.Property ["width"],"#{width}px"
         height = new stylus.nodes.Property ["height"],"#{height}px"
         backgroundImage = new stylus.nodes.Property ['background-image'],"url(#{url})"

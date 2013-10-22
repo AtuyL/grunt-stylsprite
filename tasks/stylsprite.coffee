@@ -20,9 +20,18 @@ module.exports = (grunt)->
   hash = (value)->
     md5sum = crypto.createHash 'md5'
     md5sum.update value,'utf8'
-    md5sum.digest('hex')
+    md5sum.digest 'hex'
 
   $generate = (type,dest,images,options,callback)->
+    jsonFile = hash(do process.cwd) + '.json'
+    jsonPath = path.join TMPDIR,jsonFile
+    jsonData = if fs.existsSync jsonPath then JSON.parse fs.readFileSync jsonPath else {}
+
+    images = images.filter (filepath,index,array)->
+      for spriteId,spriteData of jsonData when spriteData.filepath is filepath then return false
+      return true
+    if not images.length then return do callback
+
     id = dest.replace REG.image,''
     items = {}
 
@@ -30,12 +39,14 @@ module.exports = (grunt)->
       checksum = hash dest.replace REG.image,''
       shortsum = checksum[0...5]
       destdir = path.dirname dest
+      extname = REG.image.exec(dest)[1]
       destfile = dest
     else
       checksum = hash dest
       shortsum = checksum[0...5]
       destdir = dest
-      destfile = "#{dest}-#{shortsum}.png"
+      extname = 'png'
+      destfile = "#{dest}-#{shortsum}.#{extname}"
 
     tasks = for filepath,index in images then do (filepath,index)->
       (next)->
@@ -69,11 +80,9 @@ module.exports = (grunt)->
 
       imagemagick.convert stack,options.timeout,(error)->
         unless error
-          jsonFile = hash(do process.cwd) + '.json'
-          jsonPath = path.join TMPDIR,jsonFile
-          jsonData = if fs.existsSync jsonPath then JSON.parse fs.readFileSync jsonPath else {}
           jsonData[id] =
             id:id
+            extname:extname
             filepath:destfile
             checksum:checksum
             shortsum:shortsum

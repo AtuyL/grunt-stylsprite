@@ -8,10 +8,10 @@ body {
   height: 47px;
   background-image: url(../img/allinone.png);
   background-position: 0px 0px;
-  background-size: 239px 287px;
+  background-size: 191px 191px;
   width: 47px;
   height: 47px;
-  background-image: url(../img/icons.png);
+  background-image: url(../img/icons.undefined);
   background-position: 0px 0px;
   background-size: 95px 143px;
   width: 47px;
@@ -23,12 +23,12 @@ body {
   height: 47px;
   background-image: url(../img/allinone.png);
   background-position: 0px 0px;
-  background-size: 239px 287px;
+  background-size: 191px 191px;
   width: 47px;
   height: 47px;
   background-image: url(../img/srcdest.png);
   background-position: 0px 0px;
-  background-size: 191px 287px;
+  background-size: 191px 143px;
   width: 47px;
   height: 47px;
   background-image: url(../img/multisrc.png);

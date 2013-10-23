@@ -86,7 +86,7 @@ stylsprite:
     options:
         rootPath:'path/to'
     allinone:
-        files:['test/src/img/allinone.png':'test/src/img/**/*']
+        files:['path/to/img/allinone.png':'path/to/img/**/*']
 stylus:
     options:
         use:[stylspritePlugin('path/to/css')]

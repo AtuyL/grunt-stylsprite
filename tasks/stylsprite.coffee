@@ -1,48 +1,30 @@
-os = require 'os'
 fs = require 'fs'
 path = require 'path'
 async = require 'async'
 boxpack = require 'boxpack'
-crypto = require 'crypto'
 imagemagick = require "imagemagick"
+lib = require '../lib'
 
 module.exports = (grunt)->
-  TMPDIR = do os.tmpdir
-  
-  TYPE =
-    ALL_IN_ONE:'ALL_IN_ONE'
-    DIRECTORY:'DIRECTORY'
-    GENERATE:'GENERATE'
 
-  REG =
-    image:/\.(png|gif|jpe?g)$/i
-
-  hash = (value)->
-    md5sum = crypto.createHash 'md5'
-    md5sum.update value,'utf8'
-    md5sum.digest 'hex'
-
-  $generate = (type,dest,images,options,callback)->
-    jsonFile = hash(do process.cwd) + '.json'
-    jsonPath = path.join TMPDIR,jsonFile
-    jsonData = if fs.existsSync jsonPath then JSON.parse fs.readFileSync jsonPath else {}
+  $generate = (dest,images,options,callback)->
+    jsonData = do lib.readJSON
 
     images = images.filter (filepath,index,array)->
       for spriteId,spriteData of jsonData when spriteData.filepath is filepath then return false
       return true
     if not images.length then return do callback
 
-    id = dest.replace REG.image,''
-    items = {}
+    id = dest.replace lib.REG.image,''
 
-    if REG.image.test dest
-      checksum = hash dest.replace REG.image,''
+    if lib.REG.image.test dest
+      checksum = lib.hash dest.replace lib.REG.image,''
       shortsum = checksum[0...5]
       destdir = path.dirname dest
-      extname = REG.image.exec(dest)[1]
+      extname = lib.REG.image.exec(dest)[1]
       destfile = dest
     else
-      checksum = hash dest
+      checksum = lib.hash dest
       shortsum = checksum[0...5]
       destdir = dest
       extname = 'png'
@@ -59,6 +41,7 @@ module.exports = (grunt)->
               height:image.height + options.padding
           next error
 
+    items = {}
     async.parallel tasks,->
       width = 0
       height = 0
@@ -89,7 +72,7 @@ module.exports = (grunt)->
             width:width
             height:height
             items:items
-          fs.writeFileSync jsonPath,JSON.stringify(jsonData)
+          lib.writeJSON jsonData
         callback error
 
   grunt.registerMultiTask 'stylsprite',"wait a minute.",->
@@ -98,31 +81,32 @@ module.exports = (grunt)->
       padding:2
       timeout:10000
     hasDestDir = @data.files and @data.files[0].dest
+
     tasks = []
     for task in @files then do (task)->
       dest = null
-      if not hasDestDir and REG.image.test task.dest
+      if not hasDestDir and lib.REG.image.test task.dest
         dest = task.dest
         images = []
         for src in task.src
           if do fs.statSync(src).isDirectory
-            for file in fs.readdirSync src when REG.image.test file
+            for file in fs.readdirSync src when lib.REG.image.test file
               images.push path.join src,file
-          else if REG.image.test src and not ~images.indexOf src
+          else if lib.REG.image.test src and not ~images.indexOf src
             images.push src
         if images.length
-          tasks.push do (dest,images)-> (next)-> $generate TYPE.ALL_IN_ONE,dest,images,options,next
+          tasks.push do (dest,images)-> (next)-> $generate dest,images,options,next
       else if hasDestDir
         dest = task.dest
         images = []
         for src in task.src when do fs.statSync(src).isDirectory
-          images.push path.join src,file for file in fs.readdirSync src when REG.image.test file
+          images.push path.join src,file for file in fs.readdirSync src when lib.REG.image.test file
         if images.length
-          tasks.push do (dest,images)-> (next)-> $generate TYPE.DIRECTORY,dest,images,options,next
+          tasks.push do (dest,images)-> (next)-> $generate dest,images,options,next
       else
         for src in task.src when do fs.statSync(src).isDirectory
           dest = src
-          images = (path.join src,file for file in fs.readdirSync src when REG.image.test file)
+          images = (path.join src,file for file in fs.readdirSync src when lib.REG.image.test file)
           if images.length
-            tasks.push do (dest,images)-> (next)-> $generate TYPE.GENERATE,dest,images,options,next
+            tasks.push do (dest,images)-> (next)-> $generate dest,images,options,next
     async.parallel tasks,done

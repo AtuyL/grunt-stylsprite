@@ -18,8 +18,8 @@ module.exports = (grunt)->
     id = dest.replace lib.REG.image,''
 
     if lib.REG.image.test dest
-      checksum = lib.hash dest.replace lib.REG.image,''
-      shortsum = checksum[0...5]
+      checksum = null
+      shortsum = null
       destdir = path.dirname dest
       extname = lib.REG.image.exec(dest)[1]
       destfile = dest

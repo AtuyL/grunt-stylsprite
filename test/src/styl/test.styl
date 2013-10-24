@@ -1,17 +1,72 @@
-body
-	background-image url('../img/icons/apple.png')
-	// absolutes
-	stylsprite "/img/timer.png",2
-	stylsprite "/img/allinone/icons/apple.png"
-	// relatives
-	stylsprite '../img/icons/apple.png'
-	stylsprite '../img/subdir/icons/heart.png'
-	stylsprite "../img/allinone/icons/apple.png"
-	stylsprite "../img/srcdest/icons/apple.png"
-	stylsprite "../img/multisrc/icons/apple.png"
-	stylsprite "../img/timer.png",2
-	// brother
-	stylsprite "./img/timer.png",1
-	stylsprite "./img/timer.png",1
-	// not exist
-	stylsprite "./img/hoge.png",1
+ul li
+	&:before
+	&:after
+		content ""
+		display block
+.normal
+	&:before
+		content 'normal'
+	&:after
+		width 94px
+		height @width
+		background-image url("../img/icons/apple.png")
+.abs1
+	&:before
+		content 'stylsprite "/img/timer.png",2'
+	&:after
+		stylsprite "/img/timer.png",2
+.abs2
+	&:before
+		content 'stylsprite "/img/allinone/icons/apple.png"'
+	&:after
+		stylsprite "/img/allinone/icons/apple.png"
+.rel1
+	&:before
+		content 'stylsprite "../img/icons/apple.png"'
+	&:after
+		stylsprite "../img/icons/apple.png"
+.rel2
+	&:before
+		content 'stylsprite "../img/icons/apple.png"'
+	&:after
+		stylsprite "../img/icons/apple.png"
+.rel3
+	&:before
+		content 'stylsprite "../img/subdir/icons/heart.png"'
+	&:after
+		stylsprite "../img/subdir/icons/heart.png"
+.rel4
+	&:before
+		content 'stylsprite "../img/allinone/icons/apple.png"'
+	&:after
+		stylsprite "../img/allinone/icons/apple.png"
+.rel5
+	&:before
+		content 'stylsprite "../img/srcdest/icons/apple.png"'
+	&:after
+		stylsprite "../img/srcdest/icons/apple.png"
+.rel6
+	&:before
+		content 'stylsprite "../img/multisrc/icons/apple.png"'
+	&:after
+		stylsprite "../img/multisrc/icons/apple.png"
+.rel7
+	&:before
+		content 'stylsprite "../img/timer.png",2'
+	&:after
+		stylsprite "../img/timer.png",2
+.bros1
+	&:before
+		content 'stylsprite "./img/timer.png",1'
+	&:after
+		stylsprite "./img/timer.png",1
+.bros2
+	&:before
+		content 'stylsprite "./img/timer.png",2'
+	&:after
+		stylsprite "./img/timer.png",2
+.notfound
+	&:before
+		content 'stylsprite "./img/undefind/file/test.png",1'
+	&:after
+		stylsprite "./img/undefind/file/test.png",1

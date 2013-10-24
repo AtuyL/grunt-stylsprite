@@ -30,50 +30,59 @@ exports = module.exports = (cssPath,options={})->
 
     url = toURLString url
     relativePath = toRelativePath url
-    pixelRatio = parseFloat(pixelRatio?.val or options.pixelRatio) or 1
+    
+    pixelRatio = parseFloat(if pixelRatio then pixelRatio.val else options.pixelRatio) or 1
     
     targetPath = path.join cssPath,relativePath
 
     nodesIndex = @closestBlock.index + 1
     backgroundRepeat = new stylus.nodes.Property ['background-repeat'],"no-repeat"
-
+    
     for spriteId,spriteData of jsonData when targetPath.indexOf(spriteId) is 0
       itemId = targetPath.replace(spriteId + '/','')
       itemData = spriteData.items[itemId]
+      unless itemData then break
       spriteWidth = spriteData.width / pixelRatio
       spriteHeight = spriteData.height / pixelRatio
-      if itemData
-        x = itemData.x / pixelRatio
-        y = itemData.y / pixelRatio
-        width = itemData.width / pixelRatio
-        height = itemData.height / pixelRatio
-        url = relativePath.replace '/' + itemData.id,".#{spriteData.extname}"
-        width = new stylus.nodes.Property ["width"],"#{width}px"
-        height = new stylus.nodes.Property ["height"],"#{height}px"
-        backgroundImage = new stylus.nodes.Property ['background-image'],"url(#{url})"
-        backgroundPosition = new stylus.nodes.Property ['background-position'],"#{-x}px #{-y}px"
-        backgroundSize = new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
-        @closestBlock.nodes.splice nodesIndex,0,
-          width
-          height
-          backgroundImage
-          backgroundPosition
-          backgroundSize
-          backgroundRepeat
-        return null
+      x = itemData.x / pixelRatio
+      y = itemData.y / pixelRatio
+      width = itemData.width / pixelRatio
+      height = itemData.height / pixelRatio
+
+      if spriteData.shortsum
+        url = url.replace '/' + itemData.id,"-#{spriteData.shortsum}.#{spriteData.extname}"
+      else
+        url = url.replace '/' + itemData.id,".#{spriteData.extname}"
+
+      width = new stylus.nodes.Property ["width"],"#{width}px"
+      height = new stylus.nodes.Property ["height"],"#{height}px"
+      backgroundImage = new stylus.nodes.Property ['background-image'],"url(#{url})"
+      backgroundPosition = new stylus.nodes.Property ['background-position'],"#{-x}px #{-y}px"
+      backgroundSize = new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
+      @closestBlock.nodes.splice nodesIndex,0,
+        width
+        height
+        backgroundImage
+        backgroundPosition
+        backgroundSize
+        backgroundRepeat
+      return null
 
     if fs.existsSync targetPath
       # get image size
       imageData = fs.readFileSync targetPath
       parser = do imagesize
       switch parser.parse imageData
-        when imagesize.EOF or imagesize.INVALID 
+        when imagesize.EOF or imagesize.INVALID
           console.log 'invalid:',targetPath
           return null
         when imagesize.DONE
           rect = do parser.getResult
           width = rect.width
           height = rect.height
+        else
+          console.log 'unknown error:',targetPath
+          return null
 
       spriteWidth = width / pixelRatio
       spriteHeight = height / pixelRatio

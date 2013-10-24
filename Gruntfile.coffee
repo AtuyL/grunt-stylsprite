@@ -10,7 +10,7 @@ module.exports = (grunt)->
 		pixelRatio:2
 	
 	@initConfig
-		clean:['test/dest/**/*']
+		clean:['test/dest/**/*.+(png,css)']
 		stylsprite:
 			options: stylspriteOptions
 			allinone:files:['test/src/img/allinone.png':'test/src/img/**/*']
@@ -31,11 +31,18 @@ module.exports = (grunt)->
 				src: ['*']
 			]
 		copy:
-			test: files: [
+			rootimg: files: [ 'test/dest/timer.png':'test/src/css/img/timer.png' ]
+			rootimgdir: files: [
 				expand: true
 				cwd: 'test/src/img'
 				src: ['**/*.+(png|jpg)']
 				dest: 'test/dest/img'
+			]
+			brosimgdir: files: [
+				expand: true
+				cwd: 'test/src/img'
+				src: ['**/*.+(png|jpg)']
+				dest: 'test/dest/css/img'
 			]
 		stylus:
 			options:

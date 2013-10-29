@@ -34,16 +34,35 @@ Stylsprite-Task Options
 stylsprite:
     options:
         rootPath:"Document/Root/Dir"
-        pixelRatio:1 #<- default pixel ratio. default 1. Retina 2.
+        padding:2
 ```
+
+### rootPath:{string}
+
+Path to the document root directory.
+
+### padding:{int} [option]
+
+Interval of the image and image.  
+default value is 2.
 
 Stylsprite-Plugin Arguments
 --------
 
 ```coffee
 stylus:
-    use:[stylspritePlugin("Target/CSS/Dir")]
+    use:[stylspritePlugin("Target/CSS/Dir"[,options])]
 ```
+
+### First argument
+
+Path to the css directory.
+
+### options.pixelRatio:{int} [option]
+
+default pixelRatio.  
+default value is 1.
+if you want set to retina, set value of 2.
 
 Grunt task - Multiple Mode
 --------

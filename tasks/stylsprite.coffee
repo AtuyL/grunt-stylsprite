@@ -75,7 +75,7 @@ module.exports = (grunt)->
           lib.writeJSON jsonData
         callback error
 
-  grunt.registerMultiTask 'stylsprite',"wait a minute.",->
+  grunt.registerMultiTask 'stylsprite',"Generate css sprite image for stylus.",->
     done = do @async
     options = @options
       padding:2
@@ -84,7 +84,6 @@ module.exports = (grunt)->
 
     tasks = []
     for task in @files then do (task)->
-      dest = null
       if not hasDestDir and lib.REG.image.test task.dest
         dest = task.dest
         images = []

@@ -89,6 +89,7 @@ module.exports = (grunt)->
         dest = task.dest
         images = []
         for src in task.src
+          src = lib.normalizePath src
           if do fs.statSync(src).isDirectory
             for file in fs.readdirSync src when lib.REG.image.test file
               images.push path.join src,file
@@ -100,11 +101,13 @@ module.exports = (grunt)->
         dest = task.dest
         images = []
         for src in task.src when do fs.statSync(src).isDirectory
+          src = lib.normalizePath src
           images.push path.join src,file for file in fs.readdirSync src when lib.REG.image.test file
         if images.length
           tasks.push do (dest,images)-> (next)-> $generate dest,images,options,next
       else
         for src in task.src when do fs.statSync(src).isDirectory
+          src = lib.normalizePath src
           dest = src
           images = (path.join src,file for file in fs.readdirSync src when lib.REG.image.test file)
           if images.length

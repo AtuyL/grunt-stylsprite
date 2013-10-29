@@ -17,5 +17,8 @@ module.exports.readJSON = ->
 module.exports.writeJSON = (jsonData)->
   fs.writeFileSync jsonPath,JSON.stringify(jsonData)
 
+module.exports.normalizePath = (value)->
+  path.normalize value.replace /\/*$/i,''
+
 module.exports.REG =
   image:/\.(png|gif|jpe?g)$/i

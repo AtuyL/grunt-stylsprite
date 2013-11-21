@@ -1,7 +1,7 @@
 Usage
 ========
 
-File placements
+File placements (Example)
 --------
 
 <pre>

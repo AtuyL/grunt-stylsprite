@@ -32,16 +32,19 @@ exports = module.exports = (cssPath,options={})->
     relativePath = toRelativePath url
     
     pixelRatio = parseFloat(if pixelRatio then pixelRatio.val else options.pixelRatio) or 1
+    if not pixelRatio or pixelRatio <= 0 then pixelRatio = 1
     
     targetPath = path.join cssPath,relativePath
 
+    nodes = @closestBlock.nodes
     nodesIndex = @closestBlock.index + 1
     backgroundRepeat = new stylus.nodes.Property ['background-repeat'],"no-repeat"
-    
+
     for spriteId,spriteData of jsonData when targetPath.indexOf(spriteId) is 0
       itemId = targetPath.replace(spriteId + '/','')
       itemData = spriteData.items[itemId]
-      unless itemData then break
+      unless itemData then continue
+
       spriteWidth = spriteData.width / pixelRatio
       spriteHeight = spriteData.height / pixelRatio
       x = itemData.x / pixelRatio
@@ -54,17 +57,12 @@ exports = module.exports = (cssPath,options={})->
       else
         url = url.replace '/' + itemData.id,".#{spriteData.extname}"
 
-      width = new stylus.nodes.Property ["width"],"#{width}px"
-      height = new stylus.nodes.Property ["height"],"#{height}px"
-      backgroundImage = new stylus.nodes.Property ['background-image'],"url(#{url})"
-      backgroundPosition = new stylus.nodes.Property ['background-position'],"#{-x}px #{-y}px"
-      backgroundSize = new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
-      @closestBlock.nodes.splice nodesIndex,0,
-        width
-        height
-        backgroundImage
-        backgroundPosition
-        backgroundSize
+      nodes.splice nodesIndex,0,
+        new stylus.nodes.Property ["width"],"#{width}px"
+        new stylus.nodes.Property ["height"],"#{height}px"
+        new stylus.nodes.Property ['background-image'],"url(#{url})"
+        new stylus.nodes.Property ['background-position'],"#{-x}px #{-y}px"
+        new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
         backgroundRepeat
       return null
 
@@ -86,16 +84,12 @@ exports = module.exports = (cssPath,options={})->
 
       spriteWidth = width / pixelRatio
       spriteHeight = height / pixelRatio
-      width = new stylus.nodes.Property ["width"],"#{spriteWidth}px"
-      height = new stylus.nodes.Property ["height"],"#{spriteHeight}px"
-      backgroundImage = new stylus.nodes.Property ['background-image'],"url(#{url})"
-      backgroundSize = new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
-      
-      @closestBlock.nodes.splice nodesIndex,0,
-        width
-        height
-        backgroundImage
-        backgroundSize
+
+      nodes.splice nodesIndex,0,
+        new stylus.nodes.Property ["width"],"#{spriteWidth}px"
+        new stylus.nodes.Property ["height"],"#{spriteHeight}px"
+        new stylus.nodes.Property ['background-image'],"url(#{url})"
+        new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
         backgroundRepeat
       return null
     

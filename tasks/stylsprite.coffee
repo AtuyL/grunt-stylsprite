@@ -111,7 +111,7 @@ module.exports = (grunt)->
           images = (path.join src,file for file in fs.readdirSync src when lib.REG.image.test file)
           if images.length
             tasks.push do (dest,images)-> (next)-> $generate dest,images,options,next
-    async.parallel tasks,(error)->
+    async.series tasks,(error)->
       jsonData = do lib.readJSON
       wasRefresh = false
       for spriteId,spriteData of jsonData when not fs.existsSync spriteData.filepath

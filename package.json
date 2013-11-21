@@ -1,6 +1,6 @@
 {
   "name": "grunt-stylsprite",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "css sprite for stylus",
   "main": "index.js",
   "directories": {
@@ -18,7 +18,8 @@
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-stylus": "~0.8.0",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-contrib-copy": "~0.4.1"
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-connect": "~0.5.0"
   },
   "scripts": {
     "test": "grunt"

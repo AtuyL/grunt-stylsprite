@@ -60,7 +60,7 @@ exports = module.exports = (cssPath,options={})->
       nodes.splice nodesIndex,0,
         new stylus.nodes.Property ["width"],"#{width}px"
         new stylus.nodes.Property ["height"],"#{height}px"
-        new stylus.nodes.Property ['background-image'],"url(#{url})"
+        new stylus.nodes.Property ['background-image'],"url(\"#{url}\")"
         new stylus.nodes.Property ['background-position'],"#{-x}px #{-y}px"
         new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
         backgroundRepeat

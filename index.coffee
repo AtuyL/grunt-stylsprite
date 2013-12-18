@@ -60,7 +60,7 @@ exports = module.exports = (cssPath,options={})->
       nodes.splice nodesIndex,0,
         new stylus.nodes.Property ["width"],"#{width}px"
         new stylus.nodes.Property ["height"],"#{height}px"
-        new stylus.nodes.Property ['background-image'],"url(\"#{url}\")"
+        new stylus.nodes.Property ['background-image'],"url('#{url}')"
         new stylus.nodes.Property ['background-position'],"#{-x}px #{-y}px"
         new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
         backgroundRepeat
@@ -88,10 +88,10 @@ exports = module.exports = (cssPath,options={})->
       nodes.splice nodesIndex,0,
         new stylus.nodes.Property ["width"],"#{spriteWidth}px"
         new stylus.nodes.Property ["height"],"#{spriteHeight}px"
-        new stylus.nodes.Property ['background-image'],"url(#{url})"
+        new stylus.nodes.Property ['background-image'],"url('#{url}')"
         new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
         backgroundRepeat
       return null
     
-    return new stylus.nodes.Property ['background-image'],"url(#{url})"
+    return new stylus.nodes.Property ['background-image'],"url('#{url}')"
   -> (context)-> context.define 'stylsprite',stylsprite

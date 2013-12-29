@@ -8,57 +8,58 @@ module.exports = (grunt)->
 		pixelRatio:2
 	
 	grunt.initConfig
-		clean:['test/dest/**/*.+(png,css)']
+		clean:['test/dest']
 		stylsprite:
-			options:stylspriteOptions
-			allinone:files:['test/src/img/allinone.png':'test/src/img/**/*']
-			nodest:'test/src/img/**/*'
-			srcdest:files:['test/src/img/srcdest.png':'test/src/img/*']
-			multisrc:
-				options:test:true
-				files:['test/src/img/multisrc.png':['test/src/img/icons','test/src/img/subdir/icons/*']]
-			hasdestexpand:files:[
-				expand:true
-				cwd:'test/src/img'
-				src:['*']
-				dest:'test/src/img'
-			]
-			nodestexpand:files:[
-				expand:true
-				cwd:'test/src/img'
-				src:['*']
-			]
-		copy:
-			rootimg:files:['test/dest/timer.png':'test/src/css/img/timer.png']
-			rootimgdir:files:[
-				expand:true
-				cwd:'test/src/img'
-				src:['**/*.+(png|jpg)']
-				dest:'test/dest/img'
-			]
-			brosimgdir:files:[
-				expand:true
-				cwd:'test/src/img'
-				src:['**/*.+(png|jpg)']
-				dest:'test/dest/css/img'
-			]
+			allinone:
+				options:
+					cwd:'test/src/images'
+					dest:'test/dest/img'
+				files:[
+					'test/dest/img/t.png':'test/src/images/t/**'
+				]
+			multiple:
+				options:
+					cwd:'test/src/images'
+					dest:'test/dest/img'
+				files:[
+					expand:true
+					cwd:'test/src/images/b'
+					src:['**']
+					dest:'test/dest/img/b'
+				]
 		stylus:
 			options:
 				compress:false
-				use:[stylsprite('test/src/css',stylspriteOptions)]
-			test:
-				files:['test/dest/css/test.css':'test/src/styl/test.styl']
+				paths:['test/src/external']
+				use:[stylsprite('test/dest','test/dest')]
+			test:files:'test/dest/index.css':'test/src/pages/index.styl'
+		jade:
+			options:
+				pretty:true
+			test:files:[
+				expand:true
+				cwd:'test/src/pages'
+				src:'**/*.jade'
+				dest:'test/dest'
+				ext:'.html'
+			]
 		connect:
 			options:
 				base:'test/dest'
 				open:true
 			server:{}
 		watch:
+			jade:
+				files:['test/src/**/*.jade']
+				tasks:['jade']
 			stylsprite:
-				files:['test/src/img/**/*']
-				tasks:['stylsprite','copy','stylus']
+				files:['test/src/images/**/*']
+				tasks:['stylsprite','stylus']
 			stylus:
 				files:['test/src/**/*.styl']
 				tasks:['stylus']
 
-	grunt.registerTask 'default',['clean','stylsprite','copy','stylus','connect','watch']
+	grunt.registerTask 'default',['clean','stylsprite','stylus','jade','connect','watch']
+	
+	grunt.registerTask 'test',=>
+		console.log @file.expandMapping 'test/src/images/r/**'

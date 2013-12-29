@@ -1,121 +1,115 @@
 fs = require 'fs'
 path = require 'path'
 async = require 'async'
+mkdirp = require 'mkdirp'
 boxpack = require 'boxpack'
 imagemagick = require "imagemagick"
 lib = require '../lib'
 
 module.exports = (grunt)->
+  collect = (src,options,callback)->
+    if options.debug then console.log '----','collect'
 
-  $generate = (dest,images,options,callback)->
-    jsonData = do lib.readJSON
+    images = []
+    tasks = []
+    for dir,index in src then do (dir,index)->
+      files = (path.join dir,file for file in fs.readdirSync dir when lib.REG.image.test file)
+      unless files.length then return
+      for file,i in files then tasks.push do (file,i)->
+        (next)->
+          imagemagick.identify file,(error,image)->
+            unless error
+              images.push data =
+                src:file
+                width:image.width + options.padding
+                height:image.height + options.padding
+            next error
+    unless tasks.length
+      callback null,'dir is empty'
+    else async.parallel tasks,(error)->
+      callback images,error
 
-    images = images.filter (filepath,index,array)->
-      for spriteId,spriteData of jsonData when spriteData.filepath is filepath then return false
-      return true
-    if not images.length then return do callback
+  packing = (dest,images,options,callback)->
+    if options.debug then console.log '----','packing'
 
-    id = dest.replace lib.REG.image,''
+    allinone = lib.REG.image.test dest
+    destfile = dest + if allinone then '' else '.png'
+    destpath = path.relative options.dest,destfile
+    destdir = path.dirname destfile
 
-    if lib.REG.image.test dest
-      checksum = null
-      shortsum = null
-      destdir = path.dirname dest
-      extname = lib.REG.image.exec(dest)[1]
-      destfile = dest
-    else
-      checksum = lib.hash dest
-      shortsum = checksum[0...5]
-      destdir = dest
-      extname = 'png'
-      destfile = "#{dest}-#{shortsum}.#{extname}"
-
-    tasks = for filepath,index in images then do (filepath,index)->
-      (next)->
-        imagemagick.identify filepath,(error,image)->
-          unless error
-            images[index] =
-              id:path.relative destdir,filepath
-              filepath:filepath
-              width:image.width + options.padding
-              height:image.height + options.padding
-          next error
-
+    width = 0
+    height = 0
     items = {}
-    async.parallel tasks,->
-      width = 0
-      height = 0
-      stack = []
-      boxpack().pack(images).forEach (rect,index,array)->
-        image = images[index]
-        image.x = rect.x
-        image.y = rect.y
-        image.width = rect.width - options.padding
-        image.height = rect.height - options.padding
-        items[image.id] = image
-        width = Math.max width,rect.x + rect.width
-        height = Math.max height,rect.y + rect.height
-        stack.push image.filepath,"-geometry","+#{rect.x}+#{rect.y}","-composite"
-      width -= options.padding
-      height -= options.padding
-      stack.unshift "-size","#{width}x#{height}","xc:none"
-      stack.push destfile
+    stack = []
+    boxpack().pack(images).forEach (rect,index,array)->
+      image = images[index]
+      id = path.join options.dest,path.relative options.cwd,image.src
+      items[id] =
+        x: rect.x
+        y: rect.y
+        width: rect.width - options.padding
+        height: rect.height - options.padding
+      width = Math.max width,rect.x + rect.width
+      height = Math.max height,rect.y + rect.height
+      stack.push image.src,"-geometry","+#{rect.x}+#{rect.y}","-composite"
+    width -= options.padding
+    height -= options.padding
+    for key,value of items
+      items[key].dest =
+        file:destfile
+        width:width
+        height:height
+    stack.unshift "-size","#{width}x#{height}","xc:none"
+    stack.push destfile
 
-      imagemagick.convert stack,options.timeout,(error)->
-        unless error
-          jsonData[id] =
-            id:id
-            extname:extname
-            filepath:destfile
-            checksum:checksum
-            shortsum:shortsum
-            width:width
-            height:height
-            items:items
-          lib.writeJSON jsonData
-        callback error
+    unless fs.existsSync(destdir = path.dirname destfile) then mkdirp.sync destdir
+
+    imagemagick.convert stack,options.timeout,(error)->
+      unless error
+        json = lib.readJSON(null) or {}
+        for key,value of items
+          json[key] = value
+          if options.debug then console.log key,'\t',value.dest.file
+        lib.writeJSON null,json
+        if options.debug then console.log '----','done'
+      callback error
+
+  generate = (src,dest,options,callback)->
+    if options.debug then console.log '----------------',src,'->',dest
+    # src: ['src/images/blog']
+    # dest: 'www/images/blog.png'
+    collect src,options,(images,error)->
+      unless error
+        packing dest,images,options,(error)->
+          unless error
+            do callback
+          else
+            console.log error
+            do callback
+      else
+        console.log error
+        do callback
 
   grunt.registerMultiTask 'stylsprite',"Generate css sprite image for stylus.",->
+    # lib.writeJSON null,null
+
     done = do @async
     options = @options
+      debug:false
       padding:2
       timeout:10000
-    hasDestDir = @data.files and @data.files[0].dest
+      cwd:null
+      dest:null
+    options.cwd = options.cwd or ''
+    options.dest = options.dest or options.rootPath or options.documentRoot or ''
+    
+    files = @files.map (item,index,list)->
+      src:item.src.filter (item,index,list)-> do fs.statSync(item).isDirectory
+      dest:item.dest
+    files = files.filter (item,index,list)->
+      item.src.length
 
-    tasks = []
-    for task in @files then do (task)->
-      if not hasDestDir and lib.REG.image.test task.dest
-        dest = task.dest
-        images = []
-        for src in task.src
-          src = lib.normalizePath src
-          if do fs.statSync(src).isDirectory
-            for file in fs.readdirSync src when lib.REG.image.test file
-              images.push path.join src,file
-          else if lib.REG.image.test src and not ~images.indexOf src
-            images.push src
-        if images.length
-          tasks.push do (dest,images)-> (next)-> $generate dest,images,options,next
-      else if hasDestDir
-        dest = task.dest
-        images = []
-        for src in task.src when do fs.statSync(src).isDirectory
-          src = lib.normalizePath src
-          images.push path.join src,file for file in fs.readdirSync src when lib.REG.image.test file
-        if images.length
-          tasks.push do (dest,images)-> (next)-> $generate dest,images,options,next
-      else
-        for src in task.src when do fs.statSync(src).isDirectory
-          src = lib.normalizePath src
-          dest = src
-          images = (path.join src,file for file in fs.readdirSync src when lib.REG.image.test file)
-          if images.length
-            tasks.push do (dest,images)-> (next)-> $generate dest,images,options,next
-    async.series tasks,(error)->
-      jsonData = do lib.readJSON
-      wasRefresh = false
-      for spriteId,spriteData of jsonData when not fs.existsSync spriteData.filepath
-        delete jsonData[spriteId]
-        wasRefresh = true
-      if wasRefresh then lib.writeJSON jsonData
-      done error
+    tasks = files.map (item,index,list)->
+      (next)->
+        generate item.src,item.dest,options,next
+    async.series tasks,done

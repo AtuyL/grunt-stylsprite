@@ -5,60 +5,88 @@ File placements (Example)
 --------
 
 <pre>
-path/to
-    |- img
-    |    |- icons
-    |    |    |- twitter.png
-    |    |    |- facebook.png
-    |    |    `- gplus.png
-    |    `- images
-    |        |- twitter.png
-    |        |- facebook.png
-    |        `- gplus.png
-    |
-    `- css/example.styl
+dest
+  |- css
+  `- img
+src
+  |- img
+  |    |- icons
+  |    |    |- twitter.png
+  |    |    |- facebook.png
+  |    |    `- gplus.png
+  |    `- header
+  |        |- title.png
+  |        |- logo.png
+  |        `- description.png
+  |
+  `- css
+      `- example.styl
 </pre>
 
-Setting
+Settings
 --------
 
-```coffee
+### Example (coffee-style)
+
+<pre>
 grunt.loadNpmTasks 'grunt-stylsprite'
 stylspritePlugin = require 'grunt-stylsprite'
-```
+</pre>
 
 Stylsprite-Task Options
 --------
 
-```coffee
+### Example (coffee-style)
+<pre>
 stylsprite:
     options:
-        rootPath:"Document/Root/Dir"
+        cwd:'src/img'
+        dest:'dest/img'
         padding:2
-```
+</pre>
 
-### rootPath:{string}
+### Options
 
-Path to the document root directory.
+#### cwd
+Type: `string`
 
-### padding:{int} [option]
+Path to the root of image-sources.
+
+#### dest
+Type: `string`
+
+Path to the root of images-destination.
+
+#### padding (option)
+Type: `int`  
+Default: `2`
 
 Interval of the image and image.  
-default value is 2.
 
 Stylsprite-Plugin Arguments
 --------
 
-```coffee
+<pre>
 stylus:
-    use:[stylspritePlugin("Target/CSS/Dir"[,options])]
-```
+    options:
+        use:[stylspritePlugin("dest/css","dest"[,options])]
+    index:
+        files:
+            'dest/css/example.css':'src/css/example.styl'
+</pre>
 
 ### First argument
+Type: `string`
 
 Path to the css directory.
 
-### options.pixelRatio:{int} [option]
+### Second argument
+Type: `string`
+
+Path to the document root directory.
+
+### options.pixelRatio (option)
+Type: `int`
 
 default pixelRatio.  
 default value is 1.
@@ -67,66 +95,90 @@ if you want set to retina, set value of 2.
 Grunt task - Multiple Mode
 --------
 
-```coffee
+<pre>
 stylsprite:
     options:
-        rootPath:'path/to'
-    simple:'path/to/img/**/*'
-stylus:
-    options:
-        use:[stylspritePlugin('path/to/css')]
-    index:
-        files:['path/to/css/example.css':'path/to/css/example.styl']
-```
+        cwd:'src/img'
+        dest:'dest/img'
+    multiple:
+        files:[
+            expand:true
+            cwd:'src/img'
+            src:['**']
+            dest:'dest/img'
+        ]
+</pre>
 
 ### Yield
 
-Generate **path/to/img/icons-xxxx.png** and **path/to/img/images-xxxx.png**
+Generate `dest/img/icons.png` and `dest/img/header.png`
 
-### Usage in path/to/css/example.styl
+### Usage in src/css/example.styl
 
-```coffee
+<pre>
+.twitter
+    stylsprite('../img/icons/twitter.png')
+</pre>
+
+or
+
+<pre>
 .twitter
     stylsprite url('../img/icons/twitter.png')
-```
+</pre>
 
 and Retina support
 
-```coffee
+<pre>
 .twitter
-    stylsprite url('../img/icons/twitter.png'),2
-```
+    stylsprite('../img/icons/twitter.png',2)
+</pre>
 
 Grunt task - All In One Mode
 --------
 
-```coffee
+<pre>
 stylsprite:
     options:
-        rootPath:'path/to'
+        cwd:'src/img'
+        dest:'dest/img'
     allinone:
-        files:['path/to/img/allinone.png':'path/to/img/**/*']
+        files:[
+          'dest/img/allinone.png':'src/img/**'
+        ]
 stylus:
     options:
-        use:[stylspritePlugin('path/to/css')]
+        use:[stylspritePlugin("dest/css","dest")]
     index:
-        files:['path/to/css/example.css':'path/to/css/example.styl']
-```
+        files:[
+            'dest/css/example.css':'src/css/example.styl'
+        ]
+</pre>
 
 ### Yield
 
-Generate **path/to/img/allinone.png**
+Generate `dest/img/allinone.png`
 
-### Usage in path/to/css/example.styl
+### Usage in src/css/example.styl
 
-```coffee
+<pre>
 .twitter
-    stylsprite url('../img/allinone/icons/twitter.png')
-```
+    stylsprite('../img/icons/twitter.png')
+</pre>
+
+or
+
+<pre>
+.twitter
+    stylsprite url('../img/icons/twitter.png')
+</pre>
 
 and Retina support
 
-```coffee
+<pre>
 .twitter
-    stylsprite url('../img/allinone/icons/twitter.png'),2
-```
+    stylsprite('../img/icons/twitter.png',2)
+</pre>
+
+# For more information, please see below.
+`node_modules/grunt-stylsprite/gruntfile.coffee`

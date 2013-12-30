@@ -22,7 +22,7 @@ exports = module.exports = (cssPath,rootPath,options={})->
     if /^\//i.test url
       return path.join rootPath,url
     else if /^https?:\/\//i.test url
-      throw new Error 'sorry. unsupport yet.. : ' + url
+      throw new Error 'sorry. not supported yet.. : ' + url
     else
       return path.relative '.',path.join cssPath,url
 
@@ -94,6 +94,6 @@ exports = module.exports = (cssPath,rootPath,options={})->
         new stylus.nodes.Property ['background-size'],"#{spriteWidth}px #{spriteHeight}px"
         backgroundRepeat
       return null
-    
-    return new stylus.nodes.Property ['background-image'],"url('#{url}')"\
+
+    return new stylus.nodes.Property ['background-image'],"url('#{url}')"
   -> (context)-> context.define 'stylsprite',stylsprite

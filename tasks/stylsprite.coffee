@@ -33,7 +33,7 @@ module.exports = (grunt)->
     if options.debug then console.log '----','packing'
 
     allinone = lib.REG.image.test dest
-    destfile = dest + if allinone then '' else '.png'
+    destfile = if allinone then dest else dest + '.png'
     destpath = path.relative options.dest,destfile
     destdir = path.dirname destfile
 
@@ -43,7 +43,8 @@ module.exports = (grunt)->
     stack = []
     boxpack().pack(images).forEach (rect,index,array)->
       image = images[index]
-      id = path.join options.dest,path.relative options.cwd,image.src
+      shortPath = path.relative options.cwd,image.src
+      id = path.join options.dest,shortPath
       items[id] =
         x: rect.x
         y: rect.y
@@ -91,7 +92,7 @@ module.exports = (grunt)->
         do callback
 
   grunt.registerMultiTask 'stylsprite',"Generate css sprite image for stylus.",->
-    # lib.writeJSON null,null
+    lib.writeJSON null,null
 
     done = do @async
     options = @options
@@ -104,12 +105,24 @@ module.exports = (grunt)->
     options.dest = options.dest or options.rootPath or options.documentRoot or ''
     
     files = @files.map (item,index,list)->
-      src:item.src.filter (item,index,list)-> do fs.statSync(item).isDirectory
-      dest:item.dest
+      src:do ->
+        src = item.src
+        if item.cwd and not item.expand
+          src = src.map (srcpath,index,list)-> path.join item.cwd,srcpath
+        return src.filter (srcpath,index,list)-> do fs.statSync(srcpath).isDirectory
+      output:item.dest
+      cwd:item.orig.cwd or options.cwd
+      dest:item.orig.dest or options.dest
     files = files.filter (item,index,list)->
       item.src.length
 
     tasks = files.map (item,index,list)->
+      item.options =
+        debug:options.debug
+        padding:options.padding
+        timeout:options.timeout
+        cwd:options.cwd or item.cwd
+        dest:options.dest or item.dest
       (next)->
-        generate item.src,item.dest,options,next
+        generate item.src,item.output,item.options,next
     async.series tasks,done

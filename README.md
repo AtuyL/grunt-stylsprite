@@ -9,7 +9,7 @@ dest
  |- css
  `- img
 src
- |- img
+ |- images
  |    |- t
  |    |  |- l
  |    |  |  |- tl.png
@@ -114,13 +114,13 @@ Grunt task - Simple Mode
 ```coffee
 simple:
     options:
-        cwd:'test/src/images' # it is required in "simple" mode.
-        dest:'test/dest/img' # it is required in "simple" mode.
+        cwd:'src/images' # it is required in "simple" mode.
+        dest:'dest/img' # it is required in "simple" mode.
     files:[
-        'test/dest/img/tl.png':'test/src/images/t/l'
-        'test/dest/img/tr.png':'test/src/images/t/r'
-        'test/dest/img/bl.png':'test/src/images/b/l'
-        'test/dest/img/br.png':'test/src/images/b/r'
+        'dest/img/tl.png':'src/images/t/l'
+        'dest/img/tr.png':'src/images/t/r'
+        'dest/img/bl.png':'src/images/b/l'
+        'dest/img/br.png':'src/images/b/r'
     ]
 ```
 

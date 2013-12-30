@@ -92,7 +92,7 @@ module.exports = (grunt)->
         do callback
 
   grunt.registerMultiTask 'stylsprite',"Generate css sprite image for stylus.",->
-    lib.writeJSON null,null
+    # lib.writeJSON null,null
 
     done = do @async
     options = @options

@@ -7,21 +7,21 @@
     "test": "test"
   },
   "dependencies": {
-    "stylus": "latest",
-    "imagesize": "latest",
-    "async": "latest",
-    "imagemagick": "latest",
-    "boxpack": "latest",
-    "mkdirp": "latest"
+    "async": "^0.9.0",
+    "boxpack": "^0.1.0",
+    "imagemagick": "^0.1.3",
+    "imagesize": "^1.0.0",
+    "mkdirp": "^0.4.0",
+    "stylus": "^0.44.0"
   },
   "devDependencies": {
-    "grunt": "latest",
-    "grunt-contrib-clean": "latest",
-    "grunt-contrib-jade": "latest",
-    "grunt-contrib-stylus": "latest",
-    "grunt-contrib-watch": "latest",
-    "grunt-contrib-copy": "latest",
-    "grunt-contrib-connect": "latest"
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-connect": "^0.7.1",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-jade": "^0.11.0",
+    "grunt-contrib-stylus": "^0.16.0",
+    "grunt-contrib-watch": "^0.6.1"
   },
   "scripts": {
     "test": "grunt"
@@ -36,9 +36,16 @@
     "css",
     "sprite"
   ],
-  "author": "AtuyL",
+  "author": {
+    "name": "AtuyL"
+  },
   "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/AtuyL/grunt-stylsprite/issues"
-  }
+  },
+  "readme": "Usage\n========\n\nFile placements (Example)\n--------\n\n<pre>\ndest\n |- css\n `- img\nsrc\n |- images\n |    |- t\n |    |  |- l\n |    |  |  |- tl.png\n |    |  |  |- tr.png\n |    |  |  |- bl.png\n |    |  |  `- br.png\n |    |  |\n |    |  `- r\n |    |     |- tl.png\n |    |     |- tr.png\n |    |     |- bl.png\n |    |     `- br.png\n |    `- b\n |       |- l\n |       |  |- tl.png\n |       |  |- tr.png\n |       |  |- bl.png\n |       |  `- br.png\n |       |\n |       `- r\n |          |- tl.png\n |          |- tr.png\n |          |- bl.png\n |          `- br.png\n |\n `- css\n     `- example.styl\n</pre>\n\nSettings\n--------\n\n### Example (coffee-style)\n\n```coffee\ngrunt.loadNpmTasks 'grunt-stylsprite'\n```\n\nStylsprite-Task Options\n--------\n\n### Example (coffee-style)\n\n```coffee\nsimple:\n    options:\n        cwd:'src/images' # it is required in \"simple\" mode.\n        dest:'dest/img' # it is required in \"simple\" mode.\n    files:[\n        'dest/img/bl.png':'src/images/b/l'\n        'dest/img/tl.png':'src/images/t/l'\n        'dest/img/br.png':'src/images/b/r'\n        'dest/img/tr.png':'src/images/t/r'\n    ]\n```\n\n```coffee\nallinone:\n    options:\n        dest:'dest/img' # it is required in \"all-in-one\" mode.\n    files:[\n        expand:false # it is required in \"all-in-one\" mode.\n        cwd:'src/images'\n        src:['**']\n        dest:'dest/img/allinone.png'\n    ]\n```\n\n```coffee\nmultiple:\n    files:[\n        expand:true # it is required in \"multiple\" mode.\n        cwd:'src/images'\n        src:['**']\n        dest:'dest/img'\n    ]\n```\n\n### Options\n\n#### cwd\nType: `string`  \nRequire: `simple-mode`\n\nPath to the image-sources.\n\n#### dest\nType: `string`  \nRequire: `simple-mode` and `allinone-mode`\n\nPath to the images-destination.\n\n#### padding (option)\nType: `int`  \nDefault: `2`\n\nInterval of the image and image.\n\nGrunt task - Simple Mode\n--------\n\n```coffee\nsimple:\n    options:\n        cwd:'src/images' # it is required in \"simple\" mode.\n        dest:'dest/img' # it is required in \"simple\" mode.\n    files:[\n        'dest/img/tl.png':'src/images/t/l'\n        'dest/img/tr.png':'src/images/t/r'\n        'dest/img/bl.png':'src/images/b/l'\n        'dest/img/br.png':'src/images/b/r'\n    ]\n```\n\n### Yield\n\nGenerate `dest/img/tl.png` and `dest/img/tr.png` and `dest/img/bl.png` and `dest/img/br.png`\n\nGrunt task - Multiple Mode\n--------\n\n```coffee\nstylsprite:\n    multiple:\n        files:[\n            expand:true # it is required in \"multiple\" mode.\n            cwd:'src/images'\n            src:['**']\n            dest:'dest/img'\n        ]\n```\n\n### Yield\n\nGenerate `dest/img/t/l.png` and `dest/img/t/r.png` and `dest/img/b/l.png` and `dest/img/b/r.png`\n\nGrunt task - All In One Mode\n--------\n\n```coffee\nallinone:\n    options:\n        dest:'dest/img' # it is required in \"all-in-one\" mode.\n    files:[\n        expand:false # it is required in \"all-in-one\" mode.\n        cwd:'src/images'\n        src:['**']\n        dest:'dest/img/allinone.png'\n    ]\n```\n\n### Yield\n\nGenerate `dest/img/allinone.png`\n\n--------\n\nStylsprite-Plugin Arguments\n--------\n\n### Settings\n\nload stylus plugin\n\n```coffee\nstylspritePlugin = require 'grunt-stylsprite'\n```\n\nand stylus-task settings.\n\n```coffee\nstylus:\n    options:\n        use:[stylspritePlugin(\"dest/css\",\"dest\"[,options])]\n    index:\n        files:\n            'dest/css/example.css':'src/css/example.styl'\n```\n\n### First argument\nType: `string`\n\nPath to the css directory.\n\n### Second argument\nType: `string`\n\nPath to the document root directory.\n\n### options.pixelRatio (option)\nType: `int`\nDefault: `1`\n\ndefault pixelRatio.  \nif you want set to retina for all-sprites, set value of 2.\n\n### Usage in src/css/example.styl\n\n#### Task settings\n\n```coffee\nstylus:\n    options:\n        use:[stylspritePlugin(\"dest/css\",\"dest\")]\n    index:\n        files:[\n            'dest/css/example.css':'src/css/example.styl'\n        ]\n```\n\n#### and use stylsprite function in example.styl\n\n<pre>\n.t\n  .l\n    .tl\n      stylsprite '../img/t/l/tl.png'\n    .tr\n      stylsprite '../img/t/l/tr.png'\n    .bl\n      stylsprite '../img/t/l/bl.png'\n    .br\n      stylsprite '../img/t/l/br.png'\n</pre>\n\nor\n\n<pre>\n.t\n  .l\n    .tl\n      stylsprite url('../img/t/l/tl.png')\n    .tr\n      stylsprite url('../img/t/l/tr.png')\n    .bl\n      stylsprite url('../img/t/l/bl.png')\n    .br\n      stylsprite url('../img/t/l/br.png')\n</pre>\n\nand Retina support\n\n<pre>\n.t\n  .l\n    .tl\n      stylsprite url('../img/t/l/tl.png'),2\n    .tr\n      stylsprite url('../img/t/l/tr.png'),2\n    .bl\n      stylsprite url('../img/t/l/bl.png'),2\n    .br\n      stylsprite url('../img/t/l/br.png'),2\n</pre>\n\n# For more information, please see below.\n`node_modules/grunt-stylsprite/gruntfile.coffee`",
+  "readmeFilename": "README.md",
+  "homepage": "https://github.com/AtuyL/grunt-stylsprite",
+  "_id": "grunt-stylsprite@0.2.3",
+  "_from": "grunt-stylsprite@^0.2.3"
 }
